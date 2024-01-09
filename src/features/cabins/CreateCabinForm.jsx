@@ -12,15 +12,15 @@ import FormRow from "../../ui/FormRow";
 
 function CreateCabinForm({ cabinToEdit = {} }) {
   const { id: editId, ...editValues } = cabinToEdit;
-  const isEditSession = Boolean(editId); // Only set default values when editing and not creating
+  const isEditSession = Boolean(editId);
 
   const { register, handleSubmit, reset, getValues, formState } = useForm({
-    defaultValues: isEditSession ? editValues : {},
+    defaultValues: isEditSession ? editValues : {}, // Only set default values when editing and not creating
   });
   const { errors } = formState;
   const queryClient = useQueryClient();
 
-  const { mutate: createCabin, isLoading: isCreating } = useMutation({
+  const { mutate: createCabinFn, isLoading: isCreating } = useMutation({
     mutationFn: createEditCabin,
     onSuccess: () => {
       toast.success("New cabin successfully created");
@@ -32,7 +32,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     onError: (error) => toast.error(error.message),
   });
 
-  const { mutate: editCabin, isLoading: isEditing } = useMutation({
+  const { mutate: editCabinFn, isLoading: isEditing } = useMutation({
     // mutationFn only accept 1 argument
     mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
     onSuccess: () => {
@@ -48,11 +48,11 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   const isWorking = isCreating || isEditing;
 
   function onSubmit(data) {
-    const image = typeof data.image === "string" ? data.image : data.image[0];
+    const image = typeof data.image === "string" ? data.image : data.image[0]; //If no new image is added, keep the original one.
 
     if (isEditSession)
-      editCabin({ newCabinData: { ...data, image }, id: editId });
-    else createCabin({ ...data, image: image });
+      editCabinFn({ newCabinData: { ...data, image }, id: editId });
+    else createCabinFn({ ...data, image: image });
   }
 
   function onError(error) {
