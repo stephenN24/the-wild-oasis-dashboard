@@ -1,14 +1,13 @@
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createEditCabin } from "../../services/apiCabins";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
-import toast from "react-hot-toast";
 import FormRow from "../../ui/FormRow";
+import useCreateCabin from "./useCreateCabin";
+import useEditCabin from "./useEditCabin";
 
 function CreateCabinForm({ cabinToEdit = {} }) {
   const { id: editId, ...editValues } = cabinToEdit;
@@ -18,32 +17,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     defaultValues: isEditSession ? editValues : {}, // Only set default values when editing and not creating
   });
   const { errors } = formState;
-  const queryClient = useQueryClient();
 
-  const { mutate: createCabinFn, isLoading: isCreating } = useMutation({
-    mutationFn: createEditCabin,
-    onSuccess: () => {
-      toast.success("New cabin successfully created");
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-      });
-      reset();
-    },
-    onError: (error) => toast.error(error.message),
-  });
+  const { createCabinFn, isCreating } = useCreateCabin();
 
-  const { mutate: editCabinFn, isLoading: isEditing } = useMutation({
-    // mutationFn only accept 1 argument
-    mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
-    onSuccess: () => {
-      toast.success("New cabin successfully edited");
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-      });
-      reset();
-    },
-    onError: (error) => toast.error(error.message),
-  });
+  const { editCabinFn, isEditing } = useEditCabin();
 
   const isWorking = isCreating || isEditing;
 
@@ -51,8 +28,19 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     const image = typeof data.image === "string" ? data.image : data.image[0]; //If no new image is added, keep the original one.
 
     if (isEditSession)
-      editCabinFn({ newCabinData: { ...data, image }, id: editId });
-    else createCabinFn({ ...data, image: image });
+      editCabinFn(
+        { newCabinData: { ...data, image }, id: editId },
+        {
+          onSuccess: () => reset(),
+        }
+      );
+    else
+      createCabinFn(
+        { ...data, image: image },
+        {
+          onSuccess: () => reset(),
+        }
+      );
   }
 
   function onError(error) {
@@ -111,7 +99,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           {...register("discount", {
             required: "This field is required",
             validate: (value) =>
-              value <= getValues().regularPrice ||
+              parseFloat(value) <= parseFloat(getValues().regularPrice) ||
               "Discount should be less than the regular price",
           })}
         />
