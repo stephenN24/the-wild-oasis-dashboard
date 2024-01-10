@@ -15,12 +15,10 @@ export async function getCabins() {
 export async function createEditCabin(newCabin, id) {
   // Check if new image is added
   const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
-
   const imageName = `${Math.random()}-${newCabin.image.name}`.replaceAll(
     "/",
     ""
   );
-
   // Keep the original image if no new image is added
   const imagePath = hasImagePath
     ? newCabin.image
@@ -28,10 +26,8 @@ export async function createEditCabin(newCabin, id) {
 
   // Create query
   let query = supabase.from("cabins");
-
   // A) CREATE
   if (!id) query = query.insert([{ ...newCabin, image: imagePath }]);
-
   // B) EDIT
   if (id) query = query.update({ ...newCabin, image: imagePath }).eq("id", id);
 
@@ -41,8 +37,10 @@ export async function createEditCabin(newCabin, id) {
     throw new Error("Cabins cannot be created");
   }
 
+  if (hasImagePath) return data; // No need to upload image again
   // 2. Upload image
   //https://supabase.com/docs/reference/javascript/storage-from-upload
+
   const { error: storageError } = await supabase.storage
     .from("cabin-images")
     .upload(imageName, newCabin.image);
