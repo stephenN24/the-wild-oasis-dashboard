@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
@@ -31,7 +30,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       editCabinFn(
         { newCabinData: { ...data, image }, id: editId },
         {
-          onSuccess: (data) => {
+          onSuccess: () => {
             reset();
             onCloseModal?.();
           },
@@ -41,7 +40,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       createCabinFn(
         { ...data, image: image },
         {
-          onSuccess: (data) => {
+          onSuccess: () => {
             reset();
             onCloseModal?.();
           },
