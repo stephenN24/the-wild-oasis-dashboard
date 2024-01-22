@@ -44,7 +44,7 @@ function BookingRow({
     numGuests,
     totalPrice,
     status,
-    guests: { fullName: guestName, email },
+    guests,
     cabins: { name: cabinName },
   },
 }) {
@@ -53,6 +53,9 @@ function BookingRow({
     "checked-in": "green",
     "checked-out": "silver",
   };
+
+  const guestName = guests?.fullName ? guests.fullName : "Jonas";
+  const email = guests?.email ? guests.email : "jonas@gmail.com";
 
   return (
     <Table.Row>
