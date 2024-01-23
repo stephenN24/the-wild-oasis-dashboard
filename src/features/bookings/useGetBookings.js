@@ -3,10 +3,10 @@ import { getBookings } from "../../services/apiBookings";
 import { useSearchParams } from "react-router-dom";
 
 function useGetBookings() {
-  const [searchParam] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   //FILTER
-  const filterValue = searchParam.get("status");
+  const filterValue = searchParams.get("status");
 
   const filter =
     !filterValue || filterValue === "all"
@@ -14,17 +14,20 @@ function useGetBookings() {
       : { field: "status", value: filterValue };
 
   //SORT
-  const sortByRaw = searchParam.get("sort") || "startDate-desc";
+  const sortByRaw = searchParams.get("sort") || "startDate-desc";
 
   const [field, direction] = sortByRaw.split("-");
 
   const sortBy = { field, direction };
 
-  const { isLoading, data: bookings } = useQuery({
-    queryKey: ["bookings", filter, sortBy],
-    queryFn: () => getBookings({ filter, sortBy }),
+  // PAGINATION
+  const page = !searchParams.get("page") ? 1 : Number(searchParams.get("page"));
+
+  const { isLoading, data: { data: bookings, count } = {} } = useQuery({
+    queryKey: ["bookings", filter, sortBy, page],
+    queryFn: () => getBookings({ filter, sortBy, page }),
   });
-  return { isLoading, bookings };
+  return { isLoading, bookings, count };
 }
 
 export default useGetBookings;
