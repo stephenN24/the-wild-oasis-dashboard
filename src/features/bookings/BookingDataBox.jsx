@@ -140,12 +140,7 @@ function BookingDataBox({ booking }) {
 
       <Section>
         <Guest>
-          {countryFlag && (
-            <Flag
-              src={`https://flagsapi.com/${countryFlag}/flat/64.png`}
-              alt={`Flag of ${country}`}
-            />
-          )}
+          {countryFlag && <Flag src={countryFlag} alt={`Flag of ${country}`} />}
           <p>
             {guestName} {numGuests > 1 ? `+ ${numGuests - 1} guests` : ""}
           </p>
