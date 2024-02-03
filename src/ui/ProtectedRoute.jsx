@@ -27,7 +27,7 @@ function ProtectedRoute({ children }) {
   );
 
   //3. While loading or fetching data, show a spinner
-  if (isLoading || fetchStatus == "fetching")
+  if (isLoading)
     return (
       <FullPage>
         <Spinner />
