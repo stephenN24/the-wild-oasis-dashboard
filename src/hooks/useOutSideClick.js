@@ -9,7 +9,7 @@ function useOutSideClick(handler, listenCapturing = true) {
           handler();
         }
       }
-      document.addEventListener("click", handleClick, listenCapturing); // Prevent the click event from reaching the Modal
+      document.addEventListener("click", handleClick, listenCapturing); // Default: true =>  Prevent the click event from reaching the Modal
 
       return function () {
         document.removeEventListener("click", handleClick, listenCapturing);
