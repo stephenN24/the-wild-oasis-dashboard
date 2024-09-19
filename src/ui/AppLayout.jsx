@@ -35,7 +35,7 @@ function AppLayout() {
           <Outlet />
         </Container>
       </Main>
-{/*      <Uploader /> */}
+     <Uploader />
     </StyledAppLayout>
   );
 }
